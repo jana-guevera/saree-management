@@ -1,0 +1,220 @@
+<div class="header">
+    <h2>Products</h2>
+    {{#if (has_permission user.role actions.CREATE_PRODUCTS)}}
+        <button class="btn btn-primary" id="btn-add" onclick="showModal('create-modal')">Add +</button>
+    {{/if}}
+</div>
+
+<div class="table-wrapper">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Page Price</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" tabindex="-1" id="create-modal" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Product</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="add-form" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" name="name" id="name" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="category">Select Category</label>
+                                <select class="form-control" id="category" name="category">
+                                    <option selected disabled value="">Select Category</option>
+                                    {{#each categories}}
+                                        <option value="{{_id}}">{{name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="quantity">Quantity</label>
+                                <input type="number" name="quantity" id="quantity" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="price">Page Price</label>
+                                <input type="number" name="pagePrice" id="pagePrice" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-7">
+                            <div class="form-group">
+                                <label for="note">Note</label>
+                                <textarea rows="5" name="note" id="note" class="form-control"></textarea>
+                            </div>
+
+                            {{#each users}}
+                                <div class="form-group vendor-price" id="{{_id}}">
+                                    <label for="name">{{name}}</label>
+                                    <input type="hidden" class="vendor-id" value="{{_id}}">
+                                    <input type="hidden" class="vendor-name" value="{{name}}">
+                                    <div class="inputs">
+                                        <input type="number" step="0.01" class="form-control price" placeholder="Price">
+                                        <input type="number" step="0.01" class="form-control commission" placeholder="Commission">
+                                    </div>
+                                    <span style="color: red;" class="hide">Field should not be empty</span>
+                                </div>
+                            {{/each}}
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer mt-4">
+                        <button type="submit" class="btn btn-primary" id="add-product">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#exampleModal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" id="update-modal" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Customer</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="update-form">
+                    <input type="hidden" name="productId" id="productId">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="updateName">Name</label>
+                                <input name="updateName" id="updateName" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="updateCategory">Select Category</label>
+                                <select class="form-control" id="updateCategory" name="updateCategory">
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="updateQuantity">Quantity</label>
+                                <input type="number" name="updateQuantity" id="updateQuantity" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="updatePrice">Price</label>
+                                <input type="number" name="updatePrice" id="updatePrice" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="status">Product Status</label>
+                                <select class="form-control" id="status" name="status">
+                                    <option value="1">Available</option>
+                                    <option value="0">Unavailable</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="updateNote">Note</label>
+                                <textarea rows="5" name="updateNote" id="updateNote" class="form-control"></textarea>
+                            </div>
+
+                            <div id="vendor-prices-container">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer mt-4">
+                        <button type="submit" class="btn btn-primary" id="update-product">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#exampleModal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" id="details-modal" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Product Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6" id="left-details">
+                        
+                    </div>
+                    <div class="col-lg-6">
+                        <h5>Product Description</h5>
+                        <pre id="product-description"></pre>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" id="files-modal" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Product Files</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                {{#if (is_admin user.role)}}
+                    <form id="file-form" enctype="multipart/form-data">
+                        <input type="hidden" id="product-id">
+                        <div class="form-group">
+                            <label id="btn-file-upload" class="btn btn-primary" for="mediaFiles">Upload Files</label>
+                            <input onchange="addFiles(event)" style="display: none;" multiple type="file" class="form-control-file" id="mediaFiles" name="mediaFiles">
+                        </div>
+                    </form>
+                    <hr>
+                {{/if}}
+
+                <div class="files-container">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/js/models/product.js"></script>
+

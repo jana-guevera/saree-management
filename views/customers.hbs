@@ -1,0 +1,170 @@
+<div class="header">
+    <h2>Customers</h2>
+    <button class="btn btn-primary" id="btn-add" onclick="showModal('create-modal')">Add +</button>
+</div>
+
+<div class="table-wrapper">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Vendor</th>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Behaviour</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="table-body">
+         
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" tabindex="-1" id="create-modal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Add Customer</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="add-form">
+                    {{#if (is_admin user.role)}}
+                        <div class="form-group">
+                            <label for="vendor">Select Vendor</label>
+                            <select class="form-control" id="vendor" name="vendor">
+                                <option selected disabled value="">Select Vendor</option>
+                                {{#each users}}
+                                    <option value="{{_id}}">{{name}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                    {{else}}
+                        <input id="vendor" type="hidden" value="{{user._id}}">
+                    {{/if}}
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input name="name" id="name" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input name="email" id="email" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phoneNum">Phone Number</label>
+                        <input name="phoneNum" id="phoneNum" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <textarea name="address" id="address" class="form-control"></textarea>
+                    </div>
+
+                    <div class="modal-footer mt-4">
+                        <button type="submit" class="btn btn-primary" id="add-customer">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#exampleModal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" id="update-modal" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Update Customer</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="update-form">
+                    <input type="hidden" name="customerId" id="customerId">
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            {{#if (is_admin user.role)}}
+                                <div class="form-group">
+                                    <label for="updateVendor">Select Vendor</label>
+                                    <select class="form-control" id="updateVendor" name="updateVendor">
+                                        
+                                    </select>
+                                </div>
+                            {{else}}
+                                <input id="updateVendor" type="hidden" value="{{user._id}}">
+                            {{/if}}
+                    
+                            <div class="form-group">
+                                <label for="updateName">Name</label>
+                                <input name="updateName" id="updateName" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="updateEmail">Email</label>
+                                <input name="updateEmail" id="updateEmail" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="updatePhoneNum">Phone Number</label>
+                                <input name="updatePhoneNum" id="updatePhoneNum" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="updateAddress">Address</label>
+                                <textarea name="updateAddress" id="updateAddress" class="form-control"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="behaviour">Customer Behaviour</label>
+                                <select class="form-control" id="behaviour" name="behaviour">
+                                    <option value="1">Good</option>
+                                    <option value="0">Bad</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer mt-4">
+                        <button type="submit" class="btn btn-primary" id="update-customer">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#exampleModal">Close</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" id="details-modal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Customer Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/permissions.js"></script>
+<script src="/js/models/customer.js"></script>

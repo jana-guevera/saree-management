@@ -1,0 +1,254 @@
+<div class="header">
+    <h2>Orders</h2>
+    <button class="btn btn-primary" id="btn-add" onclick="showModal('create-modal')">Add +</button>
+</div>
+
+<div class="table-wrapper">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Vendor</th>
+                <th>Customer</th>
+                <th>Ordered Date</th>
+                <th>Total Sale</th>
+                <th>Total Commission</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" tabindex="-1" id="create-modal" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Add Order</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="add-form">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="orderType">Order Type</label>
+                                <select class="form-control" id="orderType" name="orderType">
+                                    <option selected disabled value="">Select Order Type</option>
+                                    <option value="1">Stock Order</option>
+                                    <option value="0">Pre Order</option>
+                                </select>
+                            </div>
+
+                            {{#if (is_admin user.role)}}
+                                <div class="form-group">
+                                    <label for="vendor">Select Vendor</label>
+                                    <select class="form-control" id="vendor" name="vendor">
+                                        <option selected disabled value="">Select Vendor</option>
+                                        {{#each users}}
+                                            <option value="{{_id}}">{{name}}</option>
+                                        {{/each}}
+                                    </select>
+                                </div>
+                            {{else}}
+                                <input id="vendor" type="hidden" value="{{user._id}}">
+                            {{/if}}
+
+                            <div class="form-group">
+                                <label for="customer">Customer</label>
+                                <input onblur="getAddress()" name="customer" id="customer" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="contact">Contact Number</label>
+                                <input type="number" name="contact" id="contact" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="orderDate">Ordered Date</label>
+                                <input type="datetime-local" name="orderDate" id="orderDate" class="form-control">
+                            </div>
+
+                            {{#if (is_admin user.role)}}
+                            {{else}}
+                                <div class="form-group">
+                                    <label for="deliveryDate">Delivery Date</label>
+                                    <input type="datetime-local" name="deliveryDate" id="deliveryDate" class="form-control">
+                                </div>
+                            {{/if}}
+                        </div>
+
+                        <div class="col-lg-6">
+                            {{#if (is_admin user.role)}}
+                                <div class="form-group">
+                                    <label for="deliveryDate">Delivery Date</label>
+                                    <input type="datetime-local" name="deliveryDate" id="deliveryDate" class="form-control">
+                                </div>
+                            {{/if}}
+
+                            <div class="form-group">
+                                <label for="deliveryCost">Delivery Cost</label>
+                                <input type="number" name="deliveryCost" id="deliveryCost" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="delAddress">Delivery Address</label>
+                                <textarea rows="3" name="delAddress" id="delAddress" class="form-control"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="note">Note</label>
+                                <textarea rows="3" name="note" id="note" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer mt-4">
+                        <button type="submit" class="btn btn-primary" id="add-product">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#exampleModal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" id="update-modal" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Update Customer</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="update-form">
+                    <input type="hidden" name="orderId" id="orderId">
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="updateOrderType">Order Type</label>
+                                <select class="form-control" id="updateOrderType" name="updateOrderType">
+                                    <option value="1">Stock Order</option>
+                                    <option value="0">Pre Order</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="updateOrderDate">Ordered Date</label>
+                                <input type="datetime-local" name="updateOrderDate" id="updateOrderDate" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="updateDeliveryDate">Delivery Date</label>
+                                <input type="datetime-local" name="updateDeliveryDate" id="updateDeliveryDate" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="updateContact">Contact Number</label>
+                                <input type="number" name="updateContact" id="updateContact" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="updateDeliveryCost">Delivery Cost</label>
+                                <input type="number" name="updateDeliveryCost" id="updateDeliveryCost" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="updateDelAddress">Delivery Address</label>
+                                <textarea rows="4" name="updateDelAddress" id="updateDelAddress" class="form-control"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="updateNote">Note</label>
+                                <textarea rows="4" name="updateNote" id="updateNote" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer mt-4">
+                        <button type="submit" class="btn btn-primary" id="update-order">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#exampleModal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" id="status-update-modal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Update Status</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+               
+                <input type="hidden" id="statusOrderId">
+                
+                <div class="form-group">
+                    <label for="updateStatus">Order Status</label>
+                    <select class="form-control" id="updateStatus">
+                        <option value="0">Preparing</option>
+                        <option value="1">Dispatched</option>
+                        <option value="2">Delivered</option>
+                        <option value="3">Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="modal-footer mt-4">
+                    <button type="button" onclick="updateStatus()" class="btn btn-primary" id="update-status-btn">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#exampleModal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" id="details-modal" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Order Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6" id="left-details">
+                        
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="order-address">Delivery Address</label>
+                        <pre id="order-address"></pre>
+                        <label for="order-note">Order Note</label>
+                        <pre id="order-note"></pre>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/permissions.js"></script>
+<script src="/js/models/order.js"></script>
