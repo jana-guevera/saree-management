@@ -277,6 +277,7 @@ async function addFiles(event){
         const product = await response.json();
         $(".files-container").html(generateGallaryHtml(product));
     }catch(e){
+        console.log(e);
         showError({msg: e.message});
     }finally{
         hideLoader("#btn-file-upload", {content: "Upload Files"});

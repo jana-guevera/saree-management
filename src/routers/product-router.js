@@ -204,6 +204,8 @@ router.post("/api/products/upload_files/:id", async (req, res) => {
             return res.send({error: "Product not found!"});
         }
 
+        console.log(req.files);
+
         if(req.files){
             const result = await Product.uploadFiles(req.files, product.prodId); 
             if(result.error){

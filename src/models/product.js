@@ -87,7 +87,7 @@ productSchema.statics.uploadFiles = async (files, prodId) => {
 
         return result;
     }catch(e){
-        console.log(e.message);
+        console.log(e);
         result.error = e.message;
         return result;
     }
