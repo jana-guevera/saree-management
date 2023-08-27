@@ -67,7 +67,7 @@ productSchema.statics.uploadFiles = async (files, prodId) => {
     
             if(imageFormat.isImage(fileExtension)){
                 console.log(__dirname);
-                const result = await file.mv(path.resolve("./public/uploads/" + filename));
+                await file.mv(path.resolve("./public/uploads/" + filename));
                 console.log("Result End");
                 result.imageNames.push(filename);
             }else if(imageFormat.isVideo(fileExtension)){
