@@ -20,6 +20,7 @@
     "express-fileupload": "^1.4.0",
     "express-handlebars": "^7.1.2",
     "express-session": "^1.17.3",
+    "googleapis": "^126.0.1",
     "mongoose": "^7.4.3",
     "nodemailer": "^6.9.4",
     "sharp": "^0.32.5",

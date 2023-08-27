@@ -67,6 +67,52 @@ app.use(dServiceRouter);
 // }
 // createAccount();
 
+
+// const {google} = require("googleapis");
+// const fs = require("fs");
+
+// const clientId = "933293266355-407hv8cl3dl2qbo6gtnu5grgcnu074sr.apps.googleusercontent.com";
+// const clientSecret = "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";
+// const redirectURI = "https://developers.google.com/oauthplayground";
+
+// const refreshToken = "1//04FY5aHEzxbO7CgYIARAAGAQSNwF-L9Ir_4ZxGImcpahlcs6HcLjI1rPGOZHWWViwnTEVr3mLn_pN5Ht1WH9mF1Ca_9R6uqLImLQ";
+
+// const oauth2Client = new google.auth.OAuth2(
+//     clientId,
+//     clientSecret,
+//     redirectURI
+// );
+
+// oauth2Client.setCredentials({refresh_token: refreshToken});
+
+// const drive = google.drive({
+//     version: "v3",
+//     auth: oauth2Client
+// });
+
+// const filePath = path.join(__dirname, "../public/uploads/test.jpg");
+
+// const uploadFile = async () => {
+//     try{
+//         const response = await drive.files.create({
+//             requestBody:{
+//                 name: "sample.jpg",
+//                 mimeType: "image/jpg"
+//             },
+//             media:{
+//                 mimeType: "image/jpg",
+//                 body: fs.createReadStream(filePath)
+//             }
+//         });
+
+//         console.log(response);
+//     }catch(e){
+//         console.log(e.message);
+//     }
+// }
+
+// uploadFile();
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
