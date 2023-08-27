@@ -7,6 +7,9 @@
     "start": "node src/index.js",
     "dev": "env-cmd -f ./config/dev.env nodemon src/index.js -e js,hbs"
   },
+  "engines": {
+    "node": ">=14.20.1"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
