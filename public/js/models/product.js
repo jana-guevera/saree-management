@@ -141,6 +141,7 @@ const generateGallaryHtml = (product) => {
     var html = "";
 
     product.fileNames.forEach((file) => {
+        const fileName = file.split(".")[0];
         var deleteHtml = "";
         const id = file.split(".")[0];
 
@@ -156,25 +157,78 @@ const generateGallaryHtml = (product) => {
 
         if(isImage(file)){
             html += `
-                <div class="file__image" id="fil-rec-${id}">
-                    <img class="img-file" src="/uploads/${file}"/>
-                    ${deleteHtml}
+                <div class="media-file file__image" id="fil-rec-${id}">
+                    <img class="img-file source" src="/uploads/${file}"/>
+                    <div class="file-actions">
+                        ${deleteHtml}
+                        <a class="btn btn-primary btn-sm" href="/uploads/${file}" download="${fileName}"><i class="fas fa-download"></i></a>
+                    </div>
                 </div>
             `;
         }else if(isVideo(file)){
             const ext = file.split(".").pop();
             html += `
-                <div class="file__video" id="fil-rec-${id}">
+                <div class="media-file file__video" id="fil-rec-${id}">
                     <video width="250px" height="300px" controls="controls">
-                        <source src="/uploads/${file}" type="video/${ext}" />
+                        <source class="source" src="/uploads/${file}" type="video/${ext}" />
                     </video>
-                    ${deleteHtml}
+                    <div class="file-actions">
+                        ${deleteHtml}
+                        <a class="btn btn-primary btn-sm" href="/uploads/${file}" download="${product.prodId}"><i class="fas fa-download"></i></a>
+                    </div>
                 </div>
             `;
         }
     });
 
     return html;
+}
+
+function download_files(files) {
+    function download_next(i) {
+      if (i >= files.length) {
+        return;
+      }
+      var a = document.createElement('a');
+      a.href = files[i].source;
+      a.download = files[i].fileName;
+      
+      // Add a to the doc for click to work.
+      (document.body || document.documentElement).appendChild(a);
+      if (a.click) {
+        a.click(); // The click method is supported by most browsers.
+      } else {
+        $(a).click(); // Backup using jquery
+      }
+      // Delete the temporary link.
+      a.parentNode.removeChild(a);
+      // Download the next file with a small timeout. The timeout is necessary
+      // for IE, which will otherwise only download the first file.
+      setTimeout(function() {
+        download_next(i + 1);
+      }, 300);
+    }
+    // Initiate the first download.
+    download_next(0);
+}
+
+const initiateDownloadAll = () => {
+    const fileBoxes = document.querySelectorAll(".files-container .media-file");
+    var files = [];
+
+    fileBoxes.forEach((box) => {
+        const fileName = box.getAttribute("id").split("-")[2];
+        const filePath = box.querySelector(".source").getAttribute("src");
+
+        files.push({
+            source: filePath,
+            fileName: fileName
+        });
+    });
+
+    setTimeout(() => {
+        download_files(files);
+    }, 300);
 }
 
 // Show Files
@@ -541,5 +595,3 @@ $(document).ready(() => {
         }
     });
 });
-
-

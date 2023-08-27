@@ -197,16 +197,24 @@
             </div>
 
             <div class="modal-body">
-                {{#if (is_admin user.role)}}
-                    <form id="file-form" enctype="multipart/form-data">
-                        <input type="hidden" id="product-id">
-                        <div class="form-group">
-                            <label id="btn-file-upload" class="btn btn-primary" for="mediaFiles">Upload Files</label>
-                            <input onchange="addFiles(event)" style="display: none;" multiple type="file" class="form-control-file" id="mediaFiles" name="mediaFiles">
-                        </div>
-                    </form>
-                    <hr>
-                {{/if}}
+                
+                <div class="file-add-download">
+                    {{#if (is_admin user.role)}}
+                        <form id="file-form" enctype="multipart/form-data">
+                            <input type="hidden" id="product-id">
+                            <div class="form-group">
+                                <label id="btn-file-upload" class="btn btn-primary" for="mediaFiles">Upload Files</label>
+                                <input onchange="addFiles(event)" style="display: none;" multiple type="file" class="form-control-file" id="mediaFiles" name="mediaFiles">
+                            </div>
+                        </form>
+                    {{/if}}
+                    
+                    <button onclick="initiateDownloadAll()" class="btn btn-secondary">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+
+                <hr>
 
                 <div class="files-container">
                     
@@ -216,6 +224,6 @@
     </div>
 </div>
 
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="/js/models/product.js"></script>
 

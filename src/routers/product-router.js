@@ -41,6 +41,24 @@ router.get("/products", auth, async (req, res) => {
     });
 });
 
+// Route to send preview 
+router.get("/products/preview/:id", async (req, res) => {
+    try{
+        const id = req.params.id;
+        const vendor = req.params.vendor;
+
+        const product = await Product.findById(id);
+
+        if(!product){
+            return res.send({error: "Product not found!"});
+        }
+
+        res.render("product-preview", {layout: "", product: product});
+    }catch(e){
+        res.send({error: e.message});
+    }
+});
+
 // ------------------------------------ APIs Routes ---------------------------------------------------
 
 //Create Product

@@ -61,6 +61,21 @@ thead th{
 }
 
 /* ================================== Files Styles =======================*/
+.file-add-download{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.file-add-download .form-group{
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.file-add-download label{
+    margin-bottom: 0;
+}
+
 .files-container{
     display: flex;
     flex-wrap: wrap;
@@ -79,7 +94,7 @@ thead th{
     flex-grow: 1;
 }
 
-.delete-file{
+.file-actions{
     position: absolute;
     left: 10px;
     top: 10px;
