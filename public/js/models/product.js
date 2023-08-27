@@ -157,7 +157,7 @@ const generateGallaryHtml = (product) => {
 
         if(isImage(file)){
             html += `
-                <div class="media-file file__image" id="fil-rec-${id}">
+                <div data-type="image" class="media-file file__image" id="fil-rec-${id}">
                     <img class="img-file source" src="/uploads/${file}"/>
                     <div class="file-actions">
                         ${deleteHtml}
@@ -168,9 +168,9 @@ const generateGallaryHtml = (product) => {
         }else if(isVideo(file)){
             const ext = file.split(".").pop();
             html += `
-                <div class="media-file file__video" id="fil-rec-${id}">
+                <div data-type="video" class="media-file file__video" id="fil-rec-${id}">
                     <video width="250px" height="300px" controls="controls">
-                        <source class="source" src="/uploads/${file}" type="video/${ext}" />
+                        <source src="/uploads/${file}" type="video/${ext}" />
                     </video>
                     <div class="file-actions">
                         ${deleteHtml}
@@ -218,7 +218,14 @@ const initiateDownloadAll = () => {
 
     fileBoxes.forEach((box) => {
         const fileName = box.getAttribute("id").split("-")[2];
-        const filePath = box.querySelector(".source").getAttribute("src");
+        const fileType = box.getAttribute("data-type");
+        var filePath;
+
+        if(fileType === "image"){
+            filePath = box.querySelector(".source").getAttribute("src");
+        }else{
+            filePath = box.querySelector("source").getAttribute("src");
+        }
 
         files.push({
             source: filePath,

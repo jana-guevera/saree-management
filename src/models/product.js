@@ -69,13 +69,11 @@ productSchema.statics.uploadFiles = async (files, prodId) => {
                 await file.mv(path.resolve("./public/uploads/temp/" + filename));
                 result.imageNames.push(filename);
             }else if(imageFormat.isVideo(fileExtension)){
-                await file.mv(path.resolve("./public/uploads/temp/" + filename));
+                await file.mv(path.resolve("./public/uploads/" + filename));
                 result.videoName.push(filename);
             }
         }
     
-        console.log("First half done");
-
         for(var i = 0; i < result.imageNames.length; i++){
             const tempPath = path.resolve("./public/uploads/temp/" + result.imageNames[i]);
             await imageFormat.addTextOnImage({
@@ -84,11 +82,7 @@ productSchema.statics.uploadFiles = async (files, prodId) => {
                 imagePath: path.resolve("./public/uploads/" + result.imageNames[i])
             });
 
-            console.log("Second half done");
-    
             fs.unlinkSync("./public/uploads/temp/" + result.imageNames[i]);
-
-            console.log("Third half done");
         }
         
         return result;
