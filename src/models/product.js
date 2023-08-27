@@ -67,21 +67,21 @@ productSchema.statics.uploadFiles = async (files, prodId) => {
     
             if(imageFormat.isImage(fileExtension)){
                 console.log(__dirname);
-                await file.mv(path.resolve("./public/uploads/" + filename));
+                await file.mv(path.resolve("./public/uploads/temp/" + filename));
                 console.log("Result End");
                 result.imageNames.push(filename);
             }else if(imageFormat.isVideo(fileExtension)){
-                await file.mv(path.resolve("./public/uploads/" + filename));
+                await file.mv(path.resolve("./public/uploads/temp/" + filename));
                 result.videoName.push(filename);
             }
         }
     
         for(var i = 0; i < result.imageNames.length; i++){
-            const tempPath = path.join(__dirname, "../../public/uploads/temp/" + result.imageNames[i]);
+            const tempPath = path.resolve("./public/uploads/temp/" + result.imageNames[i]);
             await imageFormat.addTextOnImage({
                 text: prodId,
                 tempPath: tempPath,
-                imagePath: path.join(__dirname, "../../public/uploads/" + result.imageNames[i])
+                imagePath: path.resolve("./public/uploads/" + result.imageNames[i])
             });
     
             fs.unlinkSync("./public/uploads/temp/" + result.imageNames[i]);
