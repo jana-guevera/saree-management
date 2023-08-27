@@ -275,6 +275,7 @@ async function addFiles(event){
         });
 
         const product = await response.json();
+        console.log(product);
         $(".files-container").html(generateGallaryHtml(product));
     }catch(e){
         console.log(e);
