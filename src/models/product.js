@@ -66,27 +66,31 @@ productSchema.statics.uploadFiles = async (files, prodId) => {
             const filename = new ObjectId().toString() + "." + fileExtension;
     
             if(imageFormat.isImage(fileExtension)){
-                console.log(__dirname, process.env.TEMP + filename);
-                await file.mv(path.join(__dirname, process.env.TEMP + filename));
-                console.log("Result End");
+                await file.mv(path.resolve("./public/uploads/temp/" + filename));
                 result.imageNames.push(filename);
             }else if(imageFormat.isVideo(fileExtension)){
-                await file.mv(path.join(__dirname, process.env.TEMP + filename));
+                await file.mv(path.resolve("./public/uploads/temp/" + filename));
                 result.videoName.push(filename);
             }
         }
     
+        console.log("First half done");
+
         for(var i = 0; i < result.imageNames.length; i++){
-            const tempPath = path.join(__dirname, process.env.TEMP + result.imageNames[i]);
+            const tempPath = path.resolve("./public/uploads/temp/" + result.imageNames[i]);
             await imageFormat.addTextOnImage({
                 text: prodId,
                 tempPath: tempPath,
-                imagePath: path.join(__dirname, process.env.UPLOADS + result.imageNames[i])
+                imagePath: path.resolve("./public/uploads/" + result.imageNames[i])
             });
+
+            console.log("Second half done");
     
             fs.unlinkSync("./public/uploads/temp/" + result.imageNames[i]);
-        }
 
+            console.log("Third half done");
+        }
+        
         return result;
     }catch(e){
         console.log(e);
@@ -129,3 +133,4 @@ productSchema.statics.removeOrderFiles = async (files) => {
 const Product = mongoose.model("Product", productSchema);
 
 module.exports = Product;
+

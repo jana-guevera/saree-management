@@ -113,7 +113,7 @@ app.use(dServiceRouter);
 
 // uploadFile();
 
-
+console.log(__dirname);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
