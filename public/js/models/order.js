@@ -4,13 +4,23 @@ var updateForm;
 
 // Populate the orders table
 $(document).ready(() => {
-    datatable = $('.table').DataTable( {
+    datatable = $('#table').DataTable( {
         "ajax": {
             "url": "/api/orders",
             "dataSrc": ""
         },
         "columns": [
             { "data": "OID" },
+            { 
+                "data": function(order){
+                    if(orderType == 0){
+                        return "Pre Order";
+                    }
+
+                    return "Stock Order";
+                }, 
+                "visible" : false
+            },
             { "data": (order) => {
                 if(order.vendor && order.vendor.name){
                     return order.vendor.name;
@@ -18,12 +28,36 @@ $(document).ready(() => {
 
                 return order.vendorName
             }},
-            { "data": "customer.name" },
+            { 
+                "data": (order) => {
+                    if(order.customer && order.customer.cusId){
+                        return order.customer.cusId;
+                    }
+
+                    return order.customerName
+                }, 
+                visible: false
+            },
+            { "data": (order) => {
+                if(order.customer && order.customer.name){
+                    return order.customer.name;
+                }
+
+                return order.customerName
+            }},
             { "data": (order) => {
                 return new Date(order.orderDate).toLocaleDateString();
             }},
+            { 
+                "data": function(order){
+                    return new Date(order.deliveryDate).toLocaleDateString();
+                }, 
+                "visible": false
+            },
             { "data": "totalSale" },
             { "data": "totalCommission" },
+            { "data": "deliveryAddress", "visible": false},
+            { "data": "note", "visible": false},
             { "data": function(order){
                 if(order.status === 0){
                     return `<button 
@@ -58,8 +92,10 @@ $(document).ready(() => {
                     <button class="btn btn-primary btn-sm" id="rec-${order._id}" onclick="initiateUpdate('${order._id}')"><i class="fas fa-edit"></i></button>
                     ${deleteHtml}
                 `
-            }}
-        ]
+            }},
+        ],
+        "dom": 'Bfrtip',
+        buttons: ["colvis"]
     });
 });
 

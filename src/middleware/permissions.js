@@ -23,6 +23,11 @@ const actions = {
     VIEW_CUSTOMERS: "VIEW_CUSTOMERS",
     DELETE_CUSTOMERS: "DELETE_CUSTOMERS",
     CREATE_CUSTOMERS: "CREATE_CUSTOMERS",
+
+    MODIFY_DELIVERY_SERVICE: "MODIFY_DELIVERY_SERVICE",
+    VIEW_DELIVERY_SERVICE: "VIEW_DELIVERY_SERVICE",
+    DELETE_DELIVERY_SERVICE: "DELETE_DELIVERY_SERVICE",
+    CREATE_DELIVERY_SERVICE: "CREATE_DELIVERY_SERVICE",
 };
   
 const roles = {
@@ -37,6 +42,11 @@ mappings.set(actions.MODIFY_USERS, [roles.ADMIN]);
 mappings.set(actions.VIEW_USERS, [roles.ADMIN]);
 mappings.set(actions.DELETE_USERS, [roles.ADMIN]);
 mappings.set(actions.CREATE_USERS, [roles.ADMIN]);
+
+mappings.set(actions.MODIFY_DELIVERY_SERVICE, [roles.ADMIN]);
+mappings.set(actions.VIEW_DELIVERY_SERVICE, [roles.ADMIN, roles.VENDOR]);
+mappings.set(actions.DELETE_DELIVERY_SERVICE, [roles.ADMIN]);
+mappings.set(actions.CREATE_DELIVERY_SERVICE, [roles.ADMIN]);
 
 mappings.set(actions.MODIFY_CATEGORIES, [roles.ADMIN]);
 mappings.set(actions.VIEW_CATEGORIES, [roles.ADMIN]);

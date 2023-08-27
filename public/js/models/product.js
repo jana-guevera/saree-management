@@ -28,6 +28,7 @@ $(document).ready(() => {
 
                 return `<span style="color:red;">Unavailable</span>`;
             }},
+            {"data": "note", "visible": false},
             { "data": function(product) {
                 const userRole = $("#userRole").val();
 

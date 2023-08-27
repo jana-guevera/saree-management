@@ -13,7 +13,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" integrity="sha512-vKMx8UnXk60zUwyUnUPM3HbQo8QfmNx7+ltw8Pm5zLusl1XIfwcxo8DbWCqMGKaWeNxWA8yrx5v3SaVpMvR3CA==" crossorigin="anonymous" referrerpolicy="no-referrer" />    
 
     {{!-- Datatables --}}
-    <link rel="stylesheet" href="//cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
 
     {{!-- Font Awesome --}}
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" />
@@ -38,6 +39,12 @@
                 {{#if (has_permission user.role actions.VIEW_USERS)}}
                     <li class="nav-item nav-users">
                         <a class="nav-link" href="/users">Users</a>
+                    </li>
+                {{/if}}
+
+                {{#if (has_permission user.role actions.CREATE_DELIVERY_SERVICE)}}
+                    <li class="nav-item nav-users">
+                        <a class="nav-link" href="/delivery-services">Delivery Services</a>
                     </li>
                 {{/if}}
 
@@ -93,8 +100,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js" integrity="sha512-37T7leoNS06R80c8Ulq7cdCDU5MNQBwlYoy1TX/WUsLFC2eYNqtKlV0QjH7r8JpG/S0GUMZwebnVFLPd6SU5yg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     {{!-- Datatables --}}
-    <script src="//cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
-    
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
     {{!-- Custom JS --}}
     <script src="/js/index.js"></script>
 </body>

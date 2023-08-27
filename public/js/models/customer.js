@@ -25,6 +25,7 @@ $(document).ready(() => {
 
                 return "<span style='color:red'>Bad</span>"
             }},
+            {"data": "address", "visible": false},
             { "data": (customer) => {
                 const userRole = $("#userRole").val();
                 var deleteHtml = "";
@@ -38,7 +39,7 @@ $(document).ready(() => {
                     <button class="btn btn-primary btn-sm" id="rec-${customer._id}" onclick="initiateUpdate('${customer._id}')"><i class="fas fa-edit"></i></button>
                     ${deleteHtml}
                 `;
-            }, "width": "15%"}
+            }, "width": "15%"},
         ]
     });
 });

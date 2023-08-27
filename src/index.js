@@ -10,6 +10,7 @@ require("./db/mongoose.js");
 const customerRouter = require("./routers/customer-router.js");
 const productRouter = require("./routers/product-router.js");
 const prodCategoryRouter = require("./routers/prod-cat-router.js");
+const dServiceRouter = require("./routers/delivery-service-router.js");
 const userRouter = require("./routers/user-router.js");
 const orderRouter = require("./routers/order-router.js");
 
@@ -51,6 +52,7 @@ app.use(customerRouter);
 app.use(prodCategoryRouter);
 app.use(productRouter);
 app.use(orderRouter);
+app.use(dServiceRouter);
 
 // const User = require("./models/user.js");
 // const createAccount = async () => {
