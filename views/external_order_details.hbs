@@ -1,0 +1,69 @@
+<div class="header">
+    <h2>Order Details - {{order.OID}}</h2>
+    <button class="btn btn-primary" id="btn-add" onclick="showModal('create-modal')">Add +</button>
+</div>
+
+<div class="table-wrapper">
+    <table class="table order-details-table">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Product Name</th>
+                <th>Sold Price</th>
+                <th>Quntity</th>
+                <th>Total Sale</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+
+        </tbody>
+    </table>
+</div>
+
+<input type="hidden" value="{{order._id}}" id="orderId">
+
+<div class="modal fade" tabindex="-1" id="create-modal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Product</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="add-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" name="name" id="name" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="price">Sold Price</label>
+                        <input type="number" name="soldPrice" id="soldPrice" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" name="quantity" id="quantity" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imageFile">Product Image</label>
+                        <input type="file" class="form-control-file" id="imageFile" name="imageFile">
+                    </div>
+                
+                    <div class="modal-footer mt-4">
+                        <button type="submit" class="btn btn-primary" id="add-product">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#exampleModal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/models/external_order_details.js"></script>
+

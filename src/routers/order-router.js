@@ -4,6 +4,7 @@ const Order = require("../models/order.js");
 const Customer = require("../models/customer.js");
 const Product = require("../models/product.js");
 const User = require("../models/user.js");
+const DeliveryService = require("../models/delivery-service.js");
 
 const auth = require("../middleware/auth");
 const apiAuth = require("../middleware/api-auth.js");
@@ -22,23 +23,32 @@ router.get("/orders", auth, async (req, res) => {
         return res.send({error: "Unauthorized action"});
     }
 
-    if(req.session.user.role !== "ADMIN"){
-        return res.render("orders", {
+    try{
+        const dServices = await DeliveryService.find({}).lean();
+
+        if(req.session.user.role !== "ADMIN"){
+            return res.render("orders", {
+                user: req.session.user, 
+                actions:permissions.actions,
+                dServices: dServices
+            });
+        }
+    
+        const users = await User.find(
+            {role: {$ne: "ADMIN"}}, 
+            {_id:1, name:1
+        }).lean();
+    
+        res.render("orders", {
             user: req.session.user, 
-            actions:permissions.actions
+            actions:permissions.actions,
+            users: users,
+            dServices: dServices
         });
+    }catch(e){
+        console.log(e);
+        res.send({error: e.message});
     }
-
-    const users = await User.find(
-        {role: {$ne: "ADMIN"}}, 
-        {_id:1, name:1
-    }).lean();
-
-    res.render("orders", {
-        user: req.session.user, 
-        actions:permissions.actions,
-        users: users
-    });
 });
 
 router.get("/orders/details/:id", auth, async (req, res) => {
@@ -52,6 +62,8 @@ router.get("/orders/details/:id", auth, async (req, res) => {
     const _id = req.params.id;
 
     try{
+        var order;
+
         if(userRole === "ADMIN"){
             order = await Order.findById(_id).lean();
         }else{
@@ -63,7 +75,15 @@ router.get("/orders/details/:id", auth, async (req, res) => {
             return res.redirect("/orders");
         }
 
-        res.render("order_details", {
+        if(order.orderSource == 1){
+            return res.render("order_details", {
+                user: req.session.user, 
+                actions:actions,
+                order: order
+            });
+        }
+
+        res.render("external_order_details", {
             user: req.session.user, 
             actions:actions,
             order: order
@@ -95,6 +115,10 @@ router.post("/api/orders", apiAuth, async (req, res) => {
 
         if(!user){
             return res.send({error: "Vendor not found."});
+        }
+
+        if(req.body.orderSource == 0 && req.body.orderType == 1){
+            return res.send({error: "Cannot place stock orders for external orders."});
         }
 
         req.body.OID = idGenerator.generateOrderId();
@@ -196,8 +220,8 @@ router.patch("/api/orders/:id", apiAuth, async (req, res) => {
     const _id = req.params.id;
 
     const updates = Object.keys(req.body);
-    const allowedUpdates = ["orderType", "orderDate", "deliveryDate", 
-        "deliveryAddress","note", "customerContact", "deliveryCost"];
+    const allowedUpdates = ["orderDate", "deliveryDate", "deliveryService",
+        "trackingCode", "deliveryAddress","note", "customerContact", "deliveryCost"];
 
     const isValidOperation = updates.every((key) => {
         return allowedUpdates.includes(key);
@@ -285,7 +309,7 @@ router.patch("/api/orders/update_status/:id", apiAuth, async (req, res) => {
             return res.send(order);
         }
 
-        if(order.orderType == 1 && req.body.status == 3){
+        if(order.orderSource == 1 && order.orderType == 1 && req.body.status == 3){
             for(var i = 0; i < order.products.length; i++){
                 const product = await Product.findOne({
                     prodId: order.products[i].prodId
@@ -345,6 +369,10 @@ router.delete("/api/orders/:id", apiAuth, async (req, res) => {
 
         await Order.findByIdAndDelete({_id: _id});
         res.send(order);
+
+        order.products.forEach(async (prod) => {
+            await Product.removeOrderFile(prod.imagePath);
+        });
     }catch(e){
         console.log(e.message);
         res.send({error: "Something went wrong! Unable to delete customer."});
@@ -436,8 +464,13 @@ router.post("/api/orders/products", apiAuth, async (req, res) => {
 
         // Copy image to order folder
         if(product.fileNames.length > 0){
-            Product.copyFile(product.fileNames[0]);
-            newProduct.imagePath = product.fileNames[0];
+            const orderImage = await Product.copyFile(product.fileNames[0]);
+
+            if(!orderImage.error){
+                newProduct.imagePath = orderImage.id;
+            }else{
+                newProduct.imagePath = product.fileNames[0].id;
+            }
         }
 
         order.products.push(newProduct);
@@ -514,7 +547,133 @@ router.delete("/api/orders/products/:prodId", apiAuth, async (req, res) => {
         }
 
         await order.save();
-        Product.removeOrderFiles([orderedProd.imagePath]);
+        Product.removeOrderFile(orderedProd.imagePath);
+
+        if(req.session.user.role !== "ADMIN"){
+            await sendEmail({
+                email: process.env.ORDER_NOTIF_EMAIL,
+                subject: "Order Updated",
+                message: `${req.session.user.name} has removed a product from the order ${order.OID}`
+            });
+        }
+
+        res.send(order);
+    }catch(e){
+        res.send({error: "Something went wrong. Unable to delete ordered product"});
+    }
+});
+
+// Add products to external orders
+router.post("/api/orders/external/products", apiAuth, async (req, res) => {
+    if(!isPermAuth(req.session.user.role, actions.MODIFY_ORDERS)){
+        return res.send({error: "Unauthorized action"});
+    }
+
+    const userRole = req.session.user.role;
+    const userId = req.session.user._id;
+
+    const orderId = req.body.orderId;
+
+    try{
+        var order;
+
+        if(userRole === "ADMIN"){
+            order = await Order.findById(orderId);
+        }else{
+            order = await Order.findOne({vendor: userId, _id: orderId});
+        }
+
+        if(!order){
+            return res.send({error: "Order not found."});
+        }
+
+        if(order.status == 3){
+            return res.send({error: "Cannot add products to Canceled orders"});
+        }
+
+        const imageId = await Product.uploadOrderFile(req.files.imageFile); 
+           
+        if(imageId.error){
+            return res.send(imageId);
+        }
+
+        const soldPrice = parseFloat(req.body.soldPrice); 
+        const totalSale = soldPrice * parseInt(req.body.quantity);
+
+        var newProduct = {
+            prodId: "External",
+            name: req.body.name,
+            quantity: req.body.quantity,
+            vendorPrice: 0,
+            soldPrice: req.body.soldPrice,
+            commssionPrice: 0,
+            totalCommission: 0,
+            totalSale: totalSale,
+            imagePath: imageId
+        }
+
+        order.products.push(newProduct);
+
+        var orderTotalSale = 0;
+
+        order.products.forEach(prod => {
+            orderTotalSale += parseFloat(prod.totalSale);
+        });
+
+        order.totalSale = orderTotalSale;
+
+        await order.save();
+
+        if(req.session.user.role !== "ADMIN"){
+            await sendEmail({
+                email: process.env.ORDER_NOTIF_EMAIL,
+                subject: "Order Updated",
+                message: `${req.session.user.name} has added a product for the order ${order.OID}`
+            });
+        }
+
+        res.send(order);
+    }catch(e){
+        console.log(e);
+        res.send({error: "Something went wrong! Unable to add product to order."});
+    }
+});
+
+// Delete products from external orders
+router.delete("/api/orders/external/products/:id", apiAuth, async (req, res) => {
+    if(!isPermAuth(req.session.user.role, actions.MODIFY_ORDERS)){
+        return res.send({error: "Unauthorized action"});
+    }
+
+    try{
+        const prodId = req.params.id;
+        const orderId = req.body.orderId;
+
+        const user = req.session.user;
+
+        const order = await Order.findById(orderId);
+
+        if(!order){
+            return res.send({error: "Order not found"});
+        }
+
+        if(user.role !== "ADMIN" && order.vendor.toString() !== user._id.toString()){
+            return res.send({error: "Order not found"});
+        }
+
+        const orderedProd = order.products.find((prod) => {
+            return prod._id.toString() === prodId;
+        });
+
+        if(!orderedProd){
+           return res.send({error: "Product not found"});
+        }
+
+        order.products = order.products.filter((prod) => prod._id.toString() !== prodId);
+        order.totalSale = order.totalSale - orderedProd.totalSale;
+
+        await order.save();
+        Product.removeOrderFile(orderedProd.imagePath);
 
         if(req.session.user.role !== "ADMIN"){
             await sendEmail({

@@ -27,6 +27,19 @@
 
 .product-image{
     width: 40px;
+    transition: all .2s;
+    -webkit-transition: all .2s;
+    -moz-transition: all .2s;
+    -ms-transition: all .2s;
+    -o-transition: all .2s;
+}
+
+.product-image:hover{
+    transform: scale(3);
+    -webkit-transform: scale(3);
+    -moz-transform: scale(3);
+    -ms-transform: scale(3);
+    -o-transform: scale(3);
 }
 
 thead th{
@@ -50,6 +63,9 @@ thead th{
     vertical-align:baseline;
 }
 
+.nodisplay{
+    display: none;
+}
 
 /*  --------------------------------- Login Styles ---------------------------------- */
 .login-form{
@@ -79,8 +95,8 @@ thead th{
 .files-container{
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
     align-items:center;
+    justify-content: space-between;
 }
 
 .file__image, .file__video{

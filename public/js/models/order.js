@@ -13,13 +13,22 @@ $(document).ready(() => {
             { "data": "OID" },
             { 
                 "data": function(order){
-                    if(orderType == 0){
+                    if(order.orderSource == 0){
+                        return "External Order";
+                    }
+
+                    return "Internal Order";
+                },
+                "visible": false
+            },
+            { 
+                "data": function(order){
+                    if(order.orderType == 0){
                         return "Pre Order";
                     }
 
                     return "Stock Order";
-                }, 
-                "visible" : false
+                }
             },
             { "data": (order) => {
                 if(order.vendor && order.vendor.name){
@@ -55,8 +64,10 @@ $(document).ready(() => {
                 "visible": false
             },
             { "data": "totalSale" },
-            { "data": "totalCommission" },
+            { "data": "totalCommission", "visible": false},
             { "data": "deliveryAddress", "visible": false},
+            { "data": "deliveryService", "visible": false},
+            { "data": "trackingCode", "visible": false},
             { "data": "note", "visible": false},
             { "data": function(order){
                 if(order.status === 0){
@@ -175,12 +186,26 @@ const showDetails = async (id) => {
     }
 }
 
+// check order source
+const checkOrderSource = () => {
+    const source = $("#orderSource").val();
+
+    if(source == 1){
+        $("#orderType").val($("#orderType option:first").val());
+        $(".orderType").removeClass("nodisplay");
+    }else if(source == 0){
+        $("#orderType").val(0);
+        $(".orderType").addClass("nodisplay");
+    }
+}
+
 // Create order
 const createOrder = async () => {
     const url = "/api/orders";
 
     const data = {
         orderType: $("#orderType").val(),
+        orderSource: $("#orderSource").val(),
         vendor: $("#vendor").val(),
         customer: $("#customer").val(),
         customerContact: $("#contact").val(),
@@ -238,6 +263,8 @@ const initiateUpdate = async (id) => {
         $("#updateContact").val(order.customerContact);
         $("#updateDeliveryCost").val(order.deliveryCost);
         $("#updateNote").val(order.note);
+        $("#trackingCode").val(order.trackingCode);
+        $("#dService").val(order.deliveryService);
         $("#orderId").val(order._id);
 
         showModal("update-modal");
@@ -255,12 +282,16 @@ const updateOrder = async () => {
     closeModal("update-modal");
     showLoader("#rec-" + id, {content: generalLoader});
 
+    const trackingCode = $("#trackingCode").val() || "Not set";
+    const dService = $("#dService").val() || "Not set";
+
     const data = {
-        orderType: $("#updateOrderType").val(),
         orderDate: $("#updateOrderDate").val(),
         deliveryDate: $("#updateDeliveryDate").val(),
         note: $("#updateNote").val(),
         deliveryAddress: $("#updateDelAddress").val(),
+        trackingCode: trackingCode,
+        deliveryService: dService
     }
 
     try{
@@ -407,6 +438,9 @@ $(document).ready(() => {
             },
             orderType:{
                 required: true
+            },
+            orderSource:{
+                required: true
             }
         }
     });
@@ -426,9 +460,6 @@ $(document).ready(() => {
                 required: true
             },
             updateDeliveryCost:{
-                required: true
-            },
-            updateOrderType:{
                 required: true
             }
         }

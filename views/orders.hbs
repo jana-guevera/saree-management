@@ -8,6 +8,7 @@
         <thead>
             <tr>
                 <th>ID</th>
+                <th>Order Source</th>
                 <th>Order Type</th>
                 <th>Vendor</th>
                 <th>Customer ID</th>
@@ -17,11 +18,11 @@
                 <th>Total Sale</th>
                 <th>Total Commission</th>
                 <th>Delivery Address</th>
+                <th>Delivery Service</th>
+                <th>Tracking Code</th>
                 <th>Note</th>
                 <th>Status</th>
                 <th>Action</th>
-
-                {{!-- For searching --}}
             </tr>
         </thead>
         <tbody id="table-body">
@@ -46,6 +47,15 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group">
+                                <label for="orderSource">Order Source</label>
+                                <select onchange="checkOrderSource()" class="form-control" id="orderSource" name="orderSource">
+                                    <option selected disabled value="">Select Source</option>
+                                    <option value="1">Internal Orders</option>
+                                    <option value="0">External Orders</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group nodisplay orderType">
                                 <label for="orderType">Order Type</label>
                                 <select class="form-control" id="orderType" name="orderType">
                                     <option selected disabled value="">Select Order Type</option>
@@ -144,14 +154,6 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group">
-                                <label for="updateOrderType">Order Type</label>
-                                <select class="form-control" id="updateOrderType" name="updateOrderType">
-                                    <option value="1">Stock Order</option>
-                                    <option value="0">Pre Order</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
                                 <label for="updateOrderDate">Ordered Date</label>
                                 <input type="datetime-local" name="updateOrderDate" id="updateOrderDate" class="form-control">
                             </div>
@@ -170,9 +172,24 @@
                                 <label for="updateDeliveryCost">Delivery Cost</label>
                                 <input type="number" name="updateDeliveryCost" id="updateDeliveryCost" class="form-control">
                             </div>
+
+                            <div class="form-group">
+                                <label for="dService">Delivery Service</label>
+                                <select class="form-control" id="dService" name="dService">
+                                    <option disabled selected value="Not set">Select Delivery Service</option>
+                                    {{#each dServices}}
+                                        <option value="{{name}}">{{name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
                         </div>
 
                         <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="trackingCode">Tracking Code</label>
+                                <input type="text" name="trackingCode" id="trackingCode" class="form-control">
+                            </div>
+
                             <div class="form-group">
                                 <label for="updateDelAddress">Delivery Address</label>
                                 <textarea rows="4" name="updateDelAddress" id="updateDelAddress" class="form-control"></textarea>

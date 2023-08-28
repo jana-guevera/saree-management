@@ -4,6 +4,7 @@ const fs = require("fs");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 const imageFormat = require("../utils/image_format.js");
+const drive = require("../utils/google-drive.js");
 
 const productSchema = mongoose.Schema({
     prodId: {
@@ -47,7 +48,7 @@ const productSchema = mongoose.Schema({
     note:{
         type: String
     },
-    fileNames: []
+    fileNames: [{}]
 });
 
 productSchema.statics.uploadFiles = async (files, prodId) => {
@@ -85,42 +86,98 @@ productSchema.statics.uploadFiles = async (files, prodId) => {
             fs.unlinkSync("./public/uploads/temp/" + result.imageNames[i]);
         }
         
-        return result;
+        // Upload to google drive
+        const filePaths = result.imageNames.concat(result.videoName);
+        const googleDrivePaths = [];
+
+        for(var i = 0; i < filePaths.length; i++){
+            const fp = filePaths[i];
+            const fullPath = path.resolve("./public/uploads/" + fp);
+            const uploadPath = process.env.GD_UPLOAD_PATH;
+
+            const data = await drive.uploadFile(fullPath, uploadPath, fp);
+
+            if(data.error){
+                continue;
+            }
+
+            googleDrivePaths.push({
+                id: data.id,
+                name: data.name
+            });
+        }
+
+        filePaths.forEach((fp) => {
+            fs.unlinkSync("./public/uploads/" + fp);
+        });
+
+        return googleDrivePaths;
     }catch(e){
         console.log(e);
-        result.error = e.message;
-        return result;
-    }
-}
-
-productSchema.statics.copyFile = (fileName) => {
-    try{
-        const oldFilePath = "./public/uploads/" + fileName;
-        const newPath = "./public/uploads/orders/" + fileName;
-
-        fs.copyFileSync(oldFilePath, newPath);
-    }catch(e){
-        console.log(e.message);
+        return {error: e.message};
     }
 }
 
 productSchema.statics.removeFiles = async (files) => {
     try{
-        files.forEach(file => {
-            fs.unlinkSync("./public/uploads/" + file);
-        });
+        for(var i = 0; i < files.length; i++){
+            const id = files[i].id || files[i]
+            const result = await drive.deleteFile(id);
+        }
     }catch(e){
         console.log(e.message);
     }
 }
 
-productSchema.statics.removeOrderFiles = async (files) => {
+productSchema.statics.copyFile = async (file) => {
     try{
-        files.forEach(file => {
-            fs.unlinkSync("./public/uploads/orders/" + file);
-        });
+        const uploadFolder = process.env.GD_UPLOAD_PATH;
+        const ordersFolder = process.env.GD_ORDERS_PATH;
+
+        const result = await drive.copyFile(file.id, uploadFolder, ordersFolder);
+        return result;
     }catch(e){
         console.log(e.message);
+    }
+}
+
+productSchema.statics.removeOrderFile = async (fileId) => {
+    try{
+        const result = await drive.deleteFile(fileId);
+    }catch(e){
+        console.log(e.message);
+    }
+}
+
+productSchema.statics.uploadOrderFile = async (file) => {
+    try{
+        const allowedFiles = ["jpeg", "png", "JPEG", "gif", "jpg"];
+        const fileExtension = file.name.split(".").pop();
+
+        if(!allowedFiles.includes(fileExtension)){
+            return {error: "Please upload image files"};
+        }
+
+        // Change the name of the file to a unique name
+        const filename = new ObjectId().toString() + "." + fileExtension;
+
+        await file.mv(path.resolve("./public/uploads/orders/" + filename));
+
+        const fullPath = path.resolve("./public/uploads/orders/" + filename);
+        const uploadPath = process.env.GD_ORDERS_PATH;
+
+        const data = await drive.uploadFile(fullPath, uploadPath, filename);
+
+        fs.unlinkSync("./public/uploads/orders/" + filename);
+
+        if(data.error){
+            return data;
+        }
+
+        return data.id;
+    }catch(e){
+        console.log(e);
+        return {error: "Something went wrong. Unable to upload image!"}
     }
 }
 

@@ -141,40 +141,39 @@ const generateGallaryHtml = (product) => {
     var html = "";
 
     product.fileNames.forEach((file) => {
-        const fileName = file.split(".")[0];
+        const fileName = file.name.split(".")[0];
         var deleteHtml = "";
-        const id = file.split(".")[0];
 
         if(userRole === "ADMIN"){
             deleteHtml = `
                 <button 
                     class="btn btn-danger btn-sm delete-file" 
-                    onclick="deleteFile('${product._id}', '${file}')">
+                    onclick="deleteFile('${product._id}', '${file.id}')">
                     <i class="fas fa-trash"></i>
                 </button>
             `;
         }
 
-        if(isImage(file)){
+        if(isImage(file.name)){
             html += `
-                <div data-type="image" class="media-file file__image" id="fil-rec-${id}">
-                    <img class="img-file source" src="/uploads/${file}"/>
+                <div data-type="image" class="media-file file__image" id="fil-rec----${file.id}">
+                    <img class="img-file source" src="${generateImageSrc(file)}"/>
                     <div class="file-actions">
                         ${deleteHtml}
-                        <a class="btn btn-primary btn-sm" href="/uploads/${file}" download="${fileName}"><i class="fas fa-download"></i></a>
+                        ${generateDownloadLink(file)}
                     </div>
                 </div>
             `;
-        }else if(isVideo(file)){
-            const ext = file.split(".").pop();
+        }else if(isVideo(file.name)){
+            const ext = file.name.split(".").pop();
             html += `
-                <div data-type="video" class="media-file file__video" id="fil-rec-${id}">
+                <div data-type="video" class="media-file file__video" id="fil-rec----${file.id}">
                     <video width="250px" height="300px" controls="controls">
-                        <source src="/uploads/${file}" type="video/${ext}" />
+                        <source src="${generateVideoSrc(file)}" type="video/${ext}" />
                     </video>
                     <div class="file-actions">
                         ${deleteHtml}
-                        <a class="btn btn-primary btn-sm" href="/uploads/${file}" download="${product.prodId}"><i class="fas fa-download"></i></a>
+                        ${generateDownloadLink(file)}
                     </div>
                 </div>
             `;
@@ -184,58 +183,28 @@ const generateGallaryHtml = (product) => {
     return html;
 }
 
-function download_files(files) {
-    function download_next(i) {
-      if (i >= files.length) {
+const clickAllDownloadLinks = (links, index) => {
+    if(index >= links.length){
         return;
-      }
-      var a = document.createElement('a');
-      a.href = files[i].source;
-      a.download = files[i].fileName;
-      
-      // Add a to the doc for click to work.
-      (document.body || document.documentElement).appendChild(a);
-      if (a.click) {
-        a.click(); // The click method is supported by most browsers.
-      } else {
-        $(a).click(); // Backup using jquery
-      }
-      // Delete the temporary link.
-      a.parentNode.removeChild(a);
-      // Download the next file with a small timeout. The timeout is necessary
-      // for IE, which will otherwise only download the first file.
-      setTimeout(function() {
-        download_next(i + 1);
-      }, 300);
     }
-    // Initiate the first download.
-    download_next(0);
-}
+
+    window.open(links[index].getAttribute("href"));
+
+    setTimeout(() => {
+        clickAllDownloadLinks(links, index + 1)
+    }, 300);
+}   
 
 const initiateDownloadAll = () => {
     const fileBoxes = document.querySelectorAll(".files-container .media-file");
-    var files = [];
+    var links = [];
 
     fileBoxes.forEach((box) => {
-        const fileName = box.getAttribute("id").split("-")[2];
-        const fileType = box.getAttribute("data-type");
-        var filePath;
-
-        if(fileType === "image"){
-            filePath = box.querySelector(".source").getAttribute("src");
-        }else{
-            filePath = box.querySelector("source").getAttribute("src");
-        }
-
-        files.push({
-            source: filePath,
-            fileName: fileName
-        });
+        const link = box.querySelector("a");
+        links.push(link);
     });
 
-    setTimeout(() => {
-        download_files(files);
-    }, 300);
+    clickAllDownloadLinks(links, 0)
 }
 
 // Show Files
@@ -292,10 +261,9 @@ async function addFiles(event){
     }
 }
 
-const deleteFile = async (productId, file) => {
-    const url = `/api/products/remove_files/${productId}/${file}`;
-    const fileId = file.split(".")[0];
-    const btnElement = "#fil-rec-" + fileId + " .delete-file";
+const deleteFile = async (productId, id) => {
+    const url = `/api/products/remove_files/${productId}/${id}`;
+    const btnElement = "#fil-rec----" + id + " .delete-file";
 
     try{
         showLoader(btnElement, {content: generalLoader});
@@ -313,7 +281,7 @@ const deleteFile = async (productId, file) => {
             return showError({msg: result.error});
         }
 
-        document.querySelector("#fil-rec-" + fileId).remove();
+        document.querySelector("#fil-rec----" + id).remove();
     }catch(e){
         showError({msg: e.message});
     }

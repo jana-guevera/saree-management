@@ -5,6 +5,10 @@ const orderSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    orderSource:{
+        type: Number,
+        required: true
+    },
     orderType:{
         type: Number,
         required: true
@@ -34,6 +38,14 @@ const orderSchema = mongoose.Schema({
     deliveryAddress:{
         type: String,
         required: true
+    },
+    deliveryService:{
+        type: String,
+        default: "Not set"
+    },
+    trackingCode:{
+        type: String,
+        default: "Not Set"
     },
     orderDate:{
         type: Date,

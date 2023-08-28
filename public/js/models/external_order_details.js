@@ -12,12 +12,10 @@ $(document).ready(() => {
             { "data": function(product){
                 return `<img class="product-image" src="${generateImageSrc({id:product.imagePath})}">`;
             }, "width": "5%"},
-            { "data": "prodId" },
             { "data": "name" },
             { "data": "soldPrice" },
             { "data": "quantity" },
             { "data": "totalSale" },
-            { "data": "totalCommission" },
             { "data": function(product) {
                 return `
                     <button class="btn btn-danger btn-sm" id="rec-del-${product._id}" onclick="initiateDelete('${product._id}')"><i class="fas fa-trash"></i></button>
@@ -29,14 +27,16 @@ $(document).ready(() => {
 
 // Add product to order
 const addProduct = async () => {
-    const url = "/api/orders/products";
+    const url = "/api/orders/external/products";
 
-    const data = {
-        orderId: $("#orderId").val(),
-        prodId: $("#prodId").val(),
-        soldPrice: $("#soldPrice").val(),
-        quantity: $("#quantity").val(),
-    }
+    const formData = new FormData();
+    formData.append("orderId", $("#orderId").val());
+    formData.append("name", $("#name").val());
+    formData.append("soldPrice", $("#soldPrice").val());
+    formData.append("quantity", $("#quantity").val());
+
+    const files = document.querySelector("#imageFile").files;
+    formData.append("imageFile", files[0]);
 
     closeModal("create-modal");
     showLoader("#btn-add", {content: addLoader});
@@ -44,12 +44,9 @@ const addProduct = async () => {
     try{
         const response = await fetch(url, {
             method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
+            body: formData
         });
-    
+
         const product = await response.json();
     
         if(product.error){
@@ -87,7 +84,7 @@ const initiateDelete = (id) => {
 
 // Delete product
 const deleteProduct = async (id) => {
-    const url = "/api/orders/products/" + id; 
+    const url = "/api/orders/external/products/" + id; 
 
     showLoader("#rec-del-" + id, {content: generalLoader});
 
@@ -124,7 +121,7 @@ $(document).ready(() => {
 
     addForm.validate({
         rules: {
-            prodId: {
+            name: {
                 required: true
             },
             quantity:{
@@ -134,6 +131,9 @@ $(document).ready(() => {
             soldPrice:{
                 required: true,
                 min: 0
+            },
+            imageFile:{
+                required: true
             }
         }
     });

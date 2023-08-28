@@ -184,7 +184,7 @@ router.delete("/api/products/:id", apiAuth, async (req, res) => {
             return res.send({error: "Product not found."});
         }
 
-        Product.removeFiles(product.fileNames);
+        await Product.removeFiles(product.fileNames);
         res.send(product);
     }catch(e){
         res.send({error: "Something went wrong! Unable to delete product."});
@@ -206,12 +206,12 @@ router.post("/api/products/upload_files/:id", async (req, res) => {
 
         if(req.files){
             const result = await Product.uploadFiles(req.files, product.prodId); 
+           
             if(result.error){
                 return res.send(result);
             }
     
-            var fileNames = result.imageNames.concat(result.videoName);
-            fileNames = product.fileNames.concat(fileNames);
+            const fileNames = product.fileNames.concat(result);
             product.fileNames = fileNames;
             await product.save();
             res.send(product);
@@ -224,13 +224,13 @@ router.post("/api/products/upload_files/:id", async (req, res) => {
     }
 });
 
-router.delete("/api/products/remove_files/:id/:file", async (req, res) => {
+router.delete("/api/products/remove_files/:id/:fileId", async (req, res) => {
     if(!isPermAuth(req.session.user.role, actions.MODIFY_PRODUCTS)){
         return res.send({error: "Unauthorized action"});
     }
 
     const productId = req.params.id;
-    const fileName = req.params.file;
+    const fileId = req.params.fileId;
 
     try{
         const product = await Product.findById(productId);
@@ -240,13 +240,13 @@ router.delete("/api/products/remove_files/:id/:file", async (req, res) => {
         }
 
         const newArr = product.fileNames.filter((f) => {
-            return f !== fileName;
+            return f.id !== fileId;
         });
 
         product.fileNames = newArr;
         await product.save();
 
-        Product.removeFiles([fileName]);
+        await Product.removeFiles([fileId]);
         res.send(product);
     }catch(e){
         res.send({error: e.message});

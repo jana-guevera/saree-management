@@ -53,3 +53,22 @@ const isVideo = (fileName) => {
     // Check if file is allowed
     return allowedFiles.includes(extension.toLowerCase());
 }
+
+
+const generateImageSrc = (file) => {
+    return `https://drive.google.com/uc?id=${file.id}&export=download`;
+}
+
+const generateDownloadLink = (file) => {
+    return `
+        <a  class="btn btn-primary btn-sm"
+            href="https://drive.google.com/uc?id=${file.id}&export=download"
+        >
+            <i class="fas fa-download"></i>
+        </a>
+    `;
+}
+
+const generateVideoSrc = (file) => {
+    return "https://drive.google.com/uc?export=download&id=" + file.id;
+}
