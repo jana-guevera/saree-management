@@ -5,6 +5,7 @@ var updateForm;
 // Populate table
 $(document).ready(() => {
     datatable = $('.table').DataTable( {
+        responsive: true,
         "ajax": {
             "url": "/api/delivery-services",
             "dataSrc": ""
@@ -16,7 +17,7 @@ $(document).ready(() => {
                     <button class="btn btn-primary btn-sm" id="rec-${dService._id}" onclick="initiateUpdate('${dService._id}')"><i class="fas fa-edit"></i></button>
                     <button class="btn btn-danger btn-sm" id="rec-del-${dService._id}" onclick="initiateDelete('${dService._id}')"><i class="fas fa-trash"></i></button>
                 `
-            }, "width": "8%"}
+            }}
         ]
     });
 });

@@ -5,6 +5,7 @@ var updateForm;
 // Populate the orders table
 $(document).ready(() => {
     datatable = $('#table').DataTable( {
+        responsive: true,
         "ajax": {
             "url": "/api/orders",
             "dataSrc": ""

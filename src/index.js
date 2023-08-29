@@ -59,7 +59,7 @@ app.use(dServiceRouter);
 //     const user = new User({
 //         name: "Janarrthan",
 //         email: "jeevananthanjana@gmail.com",
-//         password: "cuddlebug1995jana",
+//         password: "jana123",
 //         role: permissions.roles.ADMIN,
 //     });
 
@@ -67,19 +67,6 @@ app.use(dServiceRouter);
 // }
 // createAccount();
 
-
-const drive = require("./utils/google-drive.js");
-
-const test = async () => {
-    const fileId = "19ctxw5WOdnptzYLlAHNk_ZsoKjfEvbxz";
-    const newDestination = "11w0_oB1Gy838fEJfGEnlGtDXTzHcgobz";
-    const oldDestination = "10ei5Anz6vy1C03rd2KdG4QUVxzRvbxIk";
-
-    const result = await drive.copyFile(fileId, oldDestination, newDestination);
-    console.log(result);
-}
-
-// test();
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

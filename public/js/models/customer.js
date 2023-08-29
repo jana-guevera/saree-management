@@ -3,6 +3,7 @@ var datatable;
 // Populate the customer table
 $(document).ready(() => {
     datatable = $('.table').DataTable({
+        responsive: true,
         "ajax": {
             "url": "/api/customers",
             "dataSrc": ""
@@ -39,7 +40,7 @@ $(document).ready(() => {
                     <button class="btn btn-primary btn-sm" id="rec-${customer._id}" onclick="initiateUpdate('${customer._id}')"><i class="fas fa-edit"></i></button>
                     ${deleteHtml}
                 `;
-            }, "width": "15%"},
+            }},
         ]
     });
 });

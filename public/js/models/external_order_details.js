@@ -4,6 +4,7 @@ var addForm;
 // Populate the ordered products table
 $(document).ready(() => {
     datatable = $('.table').DataTable( {
+        responsive: true,
         "ajax": {
             "url": "/api/orders/" + $("#orderId").val(),
             "dataSrc": "products"

@@ -3,6 +3,7 @@ var datatable;
 // Populate the categories table
 $(document).ready(() => {
     datatable = $('.table').DataTable( {
+        responsive: true,
         "ajax": {
             "url": "/api/categories",
             "dataSrc": ""
@@ -14,7 +15,7 @@ $(document).ready(() => {
                     <button class="btn btn-primary btn-sm" id="rec-${category._id}" onclick="initiateUpdate('${category._id}')"><i class="fas fa-edit"></i></button>
                     <button class="btn btn-danger btn-sm" id="rec-del-${category._id}" onclick="initiateDelete('${category._id}')"><i class="fas fa-trash"></i></button>
                 `
-            }, "width": "8%"}
+            }}
         ]
     });
 });
