@@ -137,6 +137,11 @@ const showDetails = async (id) => {
     }
 }
 
+const imageDisplayAction = () => {
+    $(".spinner-border").addClass("nodisplay");
+    $(".file-actions").removeClass("nodisplay");
+}
+
 const generateGallaryHtml = (product) => {
     const userRole = $("#userRole").val();
     var html = "";
@@ -158,8 +163,11 @@ const generateGallaryHtml = (product) => {
         if(isImage(file.name)){
             html += `
                 <div data-type="image" class="media-file file__image" id="fil-rec----${file.id}">
-                    <img class="img-file source" src="${generateImageSrc(file)}"/>
-                    <div class="file-actions">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <img onload="imageDisplayAction()" class="img-file source" src="${generateImageSrc(file)}"/>
+                    <div class="file-actions nodisplay">
                         ${deleteHtml}
                         ${generateDownloadLink(file)}
                     </div>
