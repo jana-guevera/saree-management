@@ -105,14 +105,16 @@ thead th{
     justify-content: space-between;
 }
 
-.file__image{
+.file__image,.file__video{
     width: 250px;
     height: 300px;
-}
-
-.file__image, .file__video{
     position: relative;
     margin-bottom: 10px;
+}
+
+.file__image img, .file__video video{
+    width: 100%;
+    height: 100%;
 }
 
 .file__image .spinner-border{
@@ -125,13 +127,15 @@ thead th{
     text-align: center;
 }
 
-.files-container .file__image img{
-    width: 100%;
-    height: 100%;
-}
-
 .file-actions{
     position: absolute;
     left: 10px;
     top: 10px;
+}
+
+/* ============================ Media Query ========================== */
+@media (max-width: 783px){
+    .files-container{
+        justify-content: space-around;
+    }
 }

@@ -1,6 +1,7 @@
 var datatable;
 var addForm;
 var updateForm;
+var sellingPriceForm;
 
 // Populate the products table
 $(document).ready(() => {
@@ -21,7 +22,19 @@ $(document).ready(() => {
                 return product.categoryName;
             }},
             { "data": "quantity" },
-            { "data": "pagePrice" },
+            { "data": (product) => {
+                const userRole = $("#userRole").val();
+
+                if(userRole === "ADMIN"){
+                    return product.pagePrice;
+                }
+
+                if(product.vendorsPrice[0].vendorSellingPrice){
+                    return product.vendorsPrice[0].vendorSellingPrice;
+                }
+
+                return "Not Set";
+            }},
             { "data": function(product){
                 if(product.status == 1){
                     return `<span style="color:green;">Available</span>`;
@@ -45,6 +58,7 @@ $(document).ready(() => {
                 return `
                         <button class="btn btn-secondary btn-sm" onclick="showDetails('${product._id}')"><i class="fas fa-eye"></i></button>
                         <button class="btn btn-secondary btn-sm" onclick="showFiles('${product._id}')"><i class="fas fa-photo-video"></i></button>
+                        <button class="btn btn-primary btn-sm" id="rec-${product._id}" onclick="initiateVendorPriceUpdate('${product._id}')"><i class="fas fa-edit"></i></button>
                     `;
             }}
         ]
@@ -177,7 +191,7 @@ const generateGallaryHtml = (product) => {
             const ext = file.name.split(".").pop();
             html += `
                 <div data-type="video" class="media-file file__video" id="fil-rec----${file.id}">
-                    <video width="250px" height="300px" controls="controls">
+                    <video controls="controls">
                         <source src="${generateVideoSrc(file)}" type="video/${ext}" />
                     </video>
                     <div class="file-actions">
@@ -478,6 +492,68 @@ const updateProduct = async () => {
     }
 }
 
+// Initiate vendor selling price update modal
+const initiateVendorPriceUpdate = async (prodId) => {
+    const url = "/api/products/" + prodId;
+
+    try{
+        const response = await fetch(url);
+        const product = await response.json();
+
+        if(product.error){
+            return showError({msg: product.error});
+        }
+
+        $("#sellingPriceProdId").val(product._id);
+        $("#vendorSellingPrice").val("");
+
+        if(product.vendorsPrice[0].vendorSellingPrice){
+            $("#vendorSellingPrice").val(product.vendorsPrice[0].vendorSellingPrice);
+        }
+
+        showModal("vendor-price-update-modal");
+    }catch(e){
+        showError({msg: e.message});
+    }
+}
+
+const updateSellingPrice = async () => {
+    const id = $("#sellingPriceProdId").val();
+    const url = "/api/products/selling-price/" + id;
+
+    closeModal("vendor-price-update-modal");
+    showLoader("#rec-" + id, {content: generalLoader});
+
+    const data = {
+        vendorSellingPrice: $("#vendorSellingPrice").val(),
+    }
+
+    try{
+        const response = await fetch(url, {
+            method: "PATCH",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        const product = await response.json();
+
+        if(product.error){
+            return showError({msg: product.error});
+        }
+
+        showSuccess({msg: "Price updated successfully!"});
+    
+        sellingPriceForm[0].reset();
+        datatable.ajax.reload();
+    }catch(e){
+        showError({msg: "Something went wrong! Unable to update price."});
+    }finally{
+        hideLoader("#rec-" + id, {content: `<i class="fas fa-edit"></i>`});
+    }
+}
+
 // Alert for deleting a product
 const initiateDelete = (id) => {    
     swal({
@@ -526,6 +602,7 @@ const deleteProduct = async (id) => {
 $(document).ready(() => {
     addForm = $("#add-form");
     updateForm = $("#update-form");
+    sellingPriceForm = $("#vendor-price-update-form");
 
     addForm.validate({
         rules: {
@@ -565,6 +642,14 @@ $(document).ready(() => {
         }
     });
 
+    sellingPriceForm.validate({
+        rules:{
+            vendorSellingPrice:{
+                required: true
+            }
+        }
+    });
+
     addForm.on("submit", function(e) {
         e.preventDefault();
 
@@ -578,6 +663,14 @@ $(document).ready(() => {
 
         if(updateForm.valid()){
             updateProduct();
+        }
+    });
+
+    sellingPriceForm.on("submit", function(e){
+        e.preventDefault();
+
+        if(sellingPriceForm.valid()){
+            updateSellingPrice();
         }
     });
 });

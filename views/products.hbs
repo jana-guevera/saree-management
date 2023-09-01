@@ -13,7 +13,11 @@
                 <th>Name</th>
                 <th>Category</th>
                 <th>Quantity</th>
-                <th>Page Price</th>
+                {{#if (is_admin user.role)}}
+                    <th>Page Price</th>
+                {{else}}
+                    <th>Selling Price</th>
+                {{/if}}
                 <th>Status</th>
                 <th>Description</th>
                 <th>Action</th>
@@ -153,6 +157,33 @@
                     <div class="modal-footer mt-4">
                         <button type="submit" class="btn btn-primary" id="update-product">Save changes</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#exampleModal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" id="vendor-price-update-modal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Selling Price</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="vendor-price-update-form">
+                    <input type="hidden" name="sellingPriceProdId" id="sellingPriceProdId">
+                    <div class="form-group">
+                        <label for="vendorSellingPrice">Selling Price</label>
+                        <input type="number" name="vendorSellingPrice" id="vendorSellingPrice" class="form-control">
+                    </div>
+                    <div class="modal-footer mt-4">
+                        <button type="submit" class="btn btn-primary" id="update-selling-price">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#vendor-price-update-modal">Close</button>
                     </div>
                 </form>
             </div>

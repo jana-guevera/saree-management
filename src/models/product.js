@@ -39,6 +39,10 @@ const productSchema = mongoose.Schema({
         vendorName: String,
         vendorId: String,
         price: Number,
+        vendorSellingPrice: {
+            type: Number,
+            default: null
+        },
         commission: Number
     }],
     status: {

@@ -83,8 +83,16 @@ router.post("/api/products", apiAuth, async (req, res) => {
 //Read all Products
 router.get("/api/products", apiAuth, async (req, res) => {  
     try{
-        products = await Product.find({}).populate("category");
+        var products = await Product.find({}).populate("category");
 
+        if(req.session.user.role !== "ADMIN"){
+            products.forEach((product) => {
+                product.vendorsPrice = product.vendorsPrice.filter((vendor) => {
+                    return vendor.vendorId === req.session.user._id;
+                });
+            });
+        }
+        
         res.send(products);
     }catch(e){
         res.send({error: "Something went wrong! Unable to fetch products."});
@@ -163,6 +171,36 @@ router.patch("/api/products/:id", apiAuth, async (req, res) => {
 
         await product.save();
         await product.populate("category");
+        res.send(product);
+    }catch(e){
+        res.send({error: "Something went wrong! Unable to update product."});
+    }
+});
+
+// Update selling price
+router.patch("/api/products/selling-price/:id", apiAuth, async (req, res) => {
+    if(!isPermAuth(req.session.user.role, actions.VIEW_PRODUCTS)){
+        return res.send({error: "Unauthorized action"});
+    }
+  
+    const _id = req.params.id;
+
+    try{
+        const product = await Product.findById(_id);
+
+        if(!product){
+            res.send({
+                error: "Product not found"
+            });
+        }
+
+        product.vendorsPrice.forEach(async (vPrice) => {
+            if(vPrice.vendorId === req.session.user._id){
+                vPrice.vendorSellingPrice = req.body.vendorSellingPrice;
+                await product.save();
+            }
+        });
+
         res.send(product);
     }catch(e){
         res.send({error: "Something went wrong! Unable to update product."});
