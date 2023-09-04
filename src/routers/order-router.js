@@ -133,7 +133,7 @@ router.post("/api/orders", apiAuth, async (req, res) => {
         // await order.populate("vendor", {_id: 1, name: 1});
 
         if(req.session.user.role !== "ADMIN"){
-            await sendEmail({
+            sendEmail({
                 email: process.env.ORDER_NOTIF_EMAIL,
                 subject: "New Order Added",
                 message: `${req.session.user.name} has added a new order ${order.OID}.`
@@ -249,7 +249,7 @@ router.patch("/api/orders/:id", apiAuth, async (req, res) => {
         }
 
         if(req.session.user.role !== "ADMIN"){
-            await sendEmail({
+            sendEmail({
                 email: process.env.ORDER_NOTIF_EMAIL,
                 subject: "Order Updated",
                 message: `${req.session.user.name} has updated the order ${order.OID}`
@@ -326,7 +326,7 @@ router.patch("/api/orders/update_status/:id", apiAuth, async (req, res) => {
         await order.save();
 
         if(req.session.user.role !== "ADMIN"){
-            await sendEmail({
+            sendEmail({
                 email: process.env.ORDER_NOTIF_EMAIL,
                 subject: "Order Status Updated",
                 message: `${req.session.user.name} has updated the status of order ${order.OID}`
@@ -494,7 +494,7 @@ router.post("/api/orders/products", apiAuth, async (req, res) => {
         await product.save();
 
         if(req.session.user.role !== "ADMIN"){
-            await sendEmail({
+            sendEmail({
                 email: process.env.ORDER_NOTIF_EMAIL,
                 subject: "Order Updated",
                 message: `${req.session.user.name} has added a product for the order ${order.OID}`
@@ -550,7 +550,7 @@ router.delete("/api/orders/products/:prodId", apiAuth, async (req, res) => {
         Product.removeOrderFile(orderedProd.imagePath);
 
         if(req.session.user.role !== "ADMIN"){
-            await sendEmail({
+            sendEmail({
                 email: process.env.ORDER_NOTIF_EMAIL,
                 subject: "Order Updated",
                 message: `${req.session.user.name} has removed a product from the order ${order.OID}`
@@ -625,7 +625,7 @@ router.post("/api/orders/external/products", apiAuth, async (req, res) => {
         await order.save();
 
         if(req.session.user.role !== "ADMIN"){
-            await sendEmail({
+            sendEmail({
                 email: process.env.ORDER_NOTIF_EMAIL,
                 subject: "Order Updated",
                 message: `${req.session.user.name} has added a product for the order ${order.OID}`
@@ -676,7 +676,7 @@ router.delete("/api/orders/external/products/:id", apiAuth, async (req, res) => 
         Product.removeOrderFile(orderedProd.imagePath);
 
         if(req.session.user.role !== "ADMIN"){
-            await sendEmail({
+            sendEmail({
                 email: process.env.ORDER_NOTIF_EMAIL,
                 subject: "Order Updated",
                 message: `${req.session.user.name} has removed a product from the order ${order.OID}`
