@@ -1,9 +1,9 @@
 const express = require("express");
-const idGenerator = require("../utils/id-generator.js");
 
 const Product = require("../models/product.js");
 const Category = require("../models/prod-category.js");
 const User = require("../models/user.js");
+const Id = require("../models/ids.js");
 
 const auth = require("../middleware/auth");
 const apiAuth = require("../middleware/api-auth.js");
@@ -70,7 +70,18 @@ router.post("/api/products", apiAuth, async (req, res) => {
     try{
         const category = await Category.findById(req.body.category);
         req.body.categoryName = category.name;
-        req.body.prodId = idGenerator.generateProductId();
+        const idsId = "64f778a3d6767ea683a6dde5";
+        const idResult = await Id.findByIdAndUpdate(
+            idsId, {$inc: {prodId: 1}}, {new: true}
+        );
+
+        if(!idResult){
+            return res.send({error: "Unable to create prduct Id."});
+        }
+
+        req.body.prodId = "PRD" + idResult.prodId;
+
+
         const product = new Product(req.body);
         await product.save();
         res.send(product);

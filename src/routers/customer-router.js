@@ -1,8 +1,9 @@
 const express = require("express");
-const idGenerator = require("../utils/id-generator.js");
 
 const Customer = require("../models/customer.js");
 const User = require("../models/user.js");
+const Id = require("../models/ids.js");
+
 const auth = require("../middleware/auth");
 const apiAuth = require("../middleware/api-auth.js");
 const permissions = require("../middleware/permissions.js");
@@ -52,7 +53,16 @@ router.post("/api/customers", apiAuth, async (req, res) => {
             return res.send({error: "Vendor not found!"});
         }
 
-        req.body.cusId = idGenerator.generateCustomerId();
+        const idsId = "64f778a3d6767ea683a6dde5";
+        const idResult = await Id.findByIdAndUpdate(
+            idsId, {$inc: {cusId: 1}}, {new: true}
+        );
+
+        if(!idResult){
+            return res.send({error: "Unable to create customer Id."});
+        }
+
+        req.body.cusId = "CUS-" + idResult.cusId;
         const customer = new Customer(req.body);
         customer.vendorName = vendor.name;
         await customer.save();

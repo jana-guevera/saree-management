@@ -5,13 +5,13 @@ const Customer = require("../models/customer.js");
 const Product = require("../models/product.js");
 const User = require("../models/user.js");
 const DeliveryService = require("../models/delivery-service.js");
+const Id = require("../models/ids.js");
 
 const auth = require("../middleware/auth");
 const apiAuth = require("../middleware/api-auth.js");
 const permissions = require("../middleware/permissions.js");
 const isPermAuth = require("../middleware/permission-auth.js");
 const actions = permissions.actions;
-const idGenerator = require("../utils/id-generator.js");
 const sendEmail = require("../utils/email.js");
 
 const router = new express.Router();
@@ -121,7 +121,16 @@ router.post("/api/orders", apiAuth, async (req, res) => {
             return res.send({error: "Cannot place stock orders for external orders."});
         }
 
-        req.body.OID = idGenerator.generateOrderId();
+        const idsId = "64f778a3d6767ea683a6dde5";
+        const idResult = await Id.findByIdAndUpdate(
+            idsId, {$inc: {orderId: 1}}, {new: true}
+        );
+
+        if(!idResult){
+            return res.send({error: "Unable to create order Id."});
+        }
+
+        req.body.OID = "ORD" + idResult.orderId;
         req.body.customer = customer._id;
         req.body.customerName = customer.name;
         req.body.addedBy = req.session.user._id;

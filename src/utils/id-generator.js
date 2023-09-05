@@ -1,24 +1,27 @@
-const fs = require("fs");
+const Id = require("../models/ids.js");
 
-const generateCustomerId = () => {
-    const ids = loadFile();
+const generateCustomerId = async () => {
+    const ids = await Id.find({})[0];
     ids.cusId = ids.cusId + 1;
+    const customerId = ids.cusId;
     saveFile(ids);
-    return "CUS-" + ids.cusId;
+    return "CUS-" + customerId;
 }
 
 const generateProductId = () => {
     const ids = loadFile();
     ids.prodId = ids.prodId + 1;
+    const productId = ids.prodId;
     saveFile(ids);
-    return "PRD" + ids.prodId;
+    return "PRD" + productId;
 }
 
 const generateOrderId = () => {
     const ids = loadFile();
     ids.orderId = ids.orderId + 1;
+    const orderId = ids.orderId;
     saveFile(ids);
-    return "ORD" + ids.orderId;
+    return "ORD" + orderId;
 }
 
 const loadFile = () => {
